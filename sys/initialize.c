@@ -24,6 +24,8 @@ extern	int	start();
 
 LOCAL		sysinit();
 
+LOCAL init_glb_pts();
+
 /* Declarations of major kernel variables */
 struct	pentry	proctab[NPROC]; /* process table			*/
 int	nextproc;		/* next process slot to use in create	*/
@@ -210,6 +212,12 @@ sysinit()
 
 	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
 
+	init_bsm();
+	init_frm();
+	set_evec(14, pfintr);
+	init_glb_pts();
+	write_cr3((proctab[NULLPROC].pdbr = (FRAME0 + create_pd(NULLPROC)) * NBPG));
+	enable_paging();
 
 	return(OK);
 }
@@ -263,4 +271,25 @@ long sizmem()
 		}
 	}
 	return npages;
+}
+
+LOCAL init_glb_pts()
+{
+	int i,j;
+	pt_t *glb_pt_t;
+	for(i=0; i<4; i++)
+	{
+		int fr = create_pt(NULLPROC);
+		if(fr == SYSERR) return SYSERR;
+		glb_pt_fr[i] = FRAME0 + fr;
+
+		(pt_t *)((FRAME0 + avil) * NBPG);
+		for(j=0; i<NFRAMES; j++)
+		{
+			glb_pt_t->pt_pres = 1;
+			glb_pt_t->pt_write = 1;
+			glb_pt_t->pt_base = (i*FRAME0) + j;
+		}
+	}
+	return OK;
 }

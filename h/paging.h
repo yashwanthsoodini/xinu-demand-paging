@@ -63,12 +63,18 @@ typedef struct{
   int fr_pid;				/* process id using this frame  */
   int fr_vpno;				/* corresponding virtual page no*/
   int fr_refcnt;			/* reference count		*/
+  int fr_refbit;      /* reference bit for second-chance algo */
   int fr_type;				/* FR_DIR, FR_TBL, FR_PAGE	*/
   int fr_dirty;
+  int fr_prev;        /* prev node in the FIFO circular llist */
+  int fr_next;        /* next node in the FIFO circular llist */
 }fr_map_t;
 
 extern bs_map_t bsm_tab[];
 extern fr_map_t frm_tab[];
+extern int frm_fifo_head;
+extern int glb_pt_fr[];
+
 /* Prototypes for required API calls */
 SYSCALL xmmap(int, bsd_t, int);
 SYSCALL xunmap(int);
@@ -79,6 +85,9 @@ int get_bs(bsd_t, unsigned int);
 SYSCALL release_bs(bsd_t);
 SYSCALL read_bs(char *, bsd_t, int);
 SYSCALL write_bs(char *, bsd_t, int);
+
+int create_pd(int);
+int create_pt(int);
 
 #define NUMSTORES   16;   /* num backing stores          */
 #define STORESIZE   128;  /* backing store size in pages */
@@ -101,7 +110,7 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define FR_DIR		2
 
 #define SC 3
-#define FIFO 4
+#define LFU 4
 
 #define BACKING_STORE_BASE	0x00800000
 #define BACKING_STORE_UNIT_SIZE 0x00100000
