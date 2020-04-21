@@ -88,6 +88,7 @@ SYSCALL write_bs(char *, bsd_t, int);
 
 int create_pd(int);
 int create_pt(int);
+void insert_fifo(int);
 
 #define NUMSTORES   16;   /* num backing stores          */
 #define STORESIZE   128;  /* backing store size in pages */
