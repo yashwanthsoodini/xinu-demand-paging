@@ -12,8 +12,8 @@
  */
 SYSCALL xmmap(int virtpage, bsd_t source, int npages)
 {
-  if(npages <=0 || npages >= 128 || !valid_bsid(bs_id) || 
-     bsm_tab[bs_id].bs_access == BS_PRIVATE)
+  if((virtpage < 4096) || !valid_bsid(source) || npages <=0 || npages >= 128 ||  
+     bsm_tab[source].bs_access == BS_PRIVATE)
     return SYSERR;
 
   return bsm_map(currpid, virtpage, source, npages);
@@ -27,5 +27,11 @@ SYSCALL xmmap(int virtpage, bsd_t source, int npages)
  */
 SYSCALL xmunmap(int virtpage)
 {
-  return bsm_unmap(currpid, virtpage, 0);
+  if(bsm_unmap(currpid, virtpage, 0) == OK)
+  {
+    write_cr3(currpid);
+    return OK;
+  }
+
+  return SYSERR;
 }

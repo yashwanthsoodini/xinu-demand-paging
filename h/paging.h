@@ -90,8 +90,8 @@ int create_pd(int);
 int create_pt(int);
 void insert_fifo(int);
 
-#define NUMSTORES   16;   /* num backing stores          */
-#define STORESIZE   128;  /* backing store size in pages */
+#define NUMSTORES   16   /* num backing stores          */
+#define STORESIZE   128  /* backing store size in pages */
 
 #define NBPG		4096	/* number of bytes per page	*/
 #define FRAME0		1024	/* zero-th frame		*/
@@ -118,5 +118,7 @@ void insert_fifo(int);
 
 #define valid_bsid(bsid)  (bsid >= 0 && bsid <16)
 #define valid_bspage(page) (page >=0 && page < 128)
+
+#define valid_frid(frid)  (frid >= 0 && frid < NFRAMES)
 
 #endif

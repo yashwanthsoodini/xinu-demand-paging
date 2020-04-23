@@ -79,7 +79,7 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	pptr->vhpnpages = hsize;
 
 	/* initialize vmemlist */
-	pptr->vmemlist->mnext = mptr = (struct mblock *) 4096 * 4096;
+	pptr->vmemlist->mnext = mptr = (struct mblock *) (4096 * 4096);
 	mptr->mnext = NULL;
 	pptr->vmemlist->mlen = mptr->mlen = hsize * 4096;
 	// TO BE IMPLEMENTED: pdbr
@@ -138,12 +138,11 @@ LOCAL	newpid()
 
 LOCAL	get_priv_bs(int pid, int npages, int* store)
 {
-	if(get_bsm(store) == SYSERR) || 
-	   bsm_map(pid, 4096, store, npages) == SYSERR) 
+	if((get_bsm(store) == SYSERR) || bsm_map(pid, 4096, store, npages) == SYSERR)
 	   return SYSERR;
 
-	bsm_tab[store].bs_access = BS_PRIVATE;
-	bsm_tab[store].bs_pid = pid;
+	bsm_tab[*store].bs_access = BS_PRIVATE;
+	bsm_tab[*store].bs_pid = pid;
 
 	return OK;
 }

@@ -8,7 +8,9 @@ SYSCALL release_bs(bsd_t bs_id) {
   if(valid_bsid(bs_id) && bsm_tab[bs_id].bs_access == BS_PRIVATE && 
      bsm_tab[bs_id].bs_pid == currpid) 
   {
-    return free_bsm(bs_id);
+    free_bsm(bs_id);
+    write_cr3(currpid);
+    return OK;
   }
 
   return SYSERR;

@@ -50,6 +50,8 @@ int	console_dev;		/* the console device			*/
 
 /*  added for the demand paging */
 int page_replace_policy = SC;
+int frm_fifo_head = -1;
+int glb_pt_fr[4];
 
 /************************************************************************/
 /***				NOTE:				      ***/
@@ -136,7 +138,7 @@ sysinit()
 	struct	mblock	*mptr;
 	SYSCALL pfintr();
 
-	
+	set_evec(14, pfintr);
 
 	numproc = 0;			/* initialize system variables */
 	nextproc = NPROC-1;
@@ -214,10 +216,9 @@ sysinit()
 
 	init_bsm();
 	init_frm();
-	set_evec(14, pfintr);
 	init_glb_pts();
 	write_cr3((proctab[NULLPROC].pdbr = (FRAME0 + create_pd(NULLPROC)) * NBPG));
-	enable_paging();
+	// enable_paging();
 
 	return(OK);
 }
@@ -283,12 +284,13 @@ LOCAL init_glb_pts()
 		if(fr == SYSERR) return SYSERR;
 		glb_pt_fr[i] = FRAME0 + fr;
 
-		(pt_t *)((FRAME0 + avil) * NBPG);
+		glb_pt_t = (pt_t *)((FRAME0 + fr) * NBPG);
 		for(j=0; i<NFRAMES; j++)
 		{
 			glb_pt_t->pt_pres = 1;
 			glb_pt_t->pt_write = 1;
 			glb_pt_t->pt_base = (i*FRAME0) + j;
+			glb_pt_t++;
 		}
 	}
 	return OK;

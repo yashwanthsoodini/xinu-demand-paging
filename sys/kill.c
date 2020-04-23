@@ -8,7 +8,7 @@
 #include <io.h>
 #include <q.h>
 #include <stdio.h>
-
+#include <paging.h>
 /*------------------------------------------------------------------------
  * kill  --  kill a process and remove it from the system
  *------------------------------------------------------------------------
@@ -36,6 +36,17 @@ SYSCALL kill(int pid)
 	dev = pptr->ppagedev;
 	if (! isbaddev(dev) )
 		close(dev);
+
+	int i;
+	for(i=0; i < 16; i++)
+	{
+		if(bsm_tab[i].bs_vpno_map[i] != -1)
+		{
+			if(bsm_tab[i].bs_pid == pid) release_bs(i);
+			else bsm_unmap(pid, bsm_tab[i].bs_vpno_map[i], 0);
+		}
+	}
+	free_frm(proctab[pid].pdbr/NBPG - FRAME0);
 	
 	send(pptr->pnxtkin, pid);
 

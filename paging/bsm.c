@@ -90,8 +90,12 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages)
     {
         bsm_tab[source].bs_vpno_map[pid] = vpno;
         
-        if(bsm_tab[source].bsm_status == BSM_UNMAPPED)
+        if(bsm_tab[source].bs_status == BSM_UNMAPPED)
         {
+            if(npages > bsm_tab[source].bs_npages)
+            {
+                return SYSERR;
+            }
             bsm_tab[source].bs_status = BSM_MAPPED;
             bsm_tab[source].bs_npages = npages;
         }

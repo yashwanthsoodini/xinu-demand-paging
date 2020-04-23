@@ -20,13 +20,13 @@ SYSCALL	vfreemem(block, size)
 	struct pentry *pptr;
 
 	if(size==0 || 
-	   (unsigned)block < (unsigned)(pptr = &proctab[currpid])->vmemlist.mnext ||
-	   (unsigned)block > (unsigned)pptr->vmemlist.mnext + vhpnpages * 4096)
+	   (unsigned)block < (unsigned)((pptr = &proctab[currpid])->vmemlist)->mnext ||
+	   (unsigned)block > (unsigned)(pptr->vmemlist)->mnext + pptr->vhpnpages * 4096)
 	   									   
 		return(SYSERR);
 	size = (unsigned)roundmb(size);
 	disable(ps);
-	for (q= &(pptr->vmemlist),p=pptr->vmemlist.mnext ;
+	for (q= &(pptr->vmemlist),p=(pptr->vmemlist)->mnext ;
 	     p != (struct mblock *) NULL && p < block ;
 	     q=p,p=p->mnext )
 		;
